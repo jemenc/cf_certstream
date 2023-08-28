@@ -35,20 +35,22 @@ def analize_message():
 def print_callback(message, context):
     """Fuction to save the messages into the stack in oder to analize them later
     """
-    with lock:
-        stack.put(item=message)
     
-
-    print("Received messaged -> {}".format(stack.get()))
+    if message['issuer'] in ["Let's Encrypt","ZeroSSL"]:
+        stack.put(item=message)
+        logging.info( f" stack current size: {stack.qsize()}")
+        logging.info("Messaged from stream -> {}".format(message))
+        #logging.info("Messaged from stream -> {}".format(message))
+    #logging.info("Messaged from stack -> {}".format(stack.get()))
 
 #Threands
 
 #Gather certstream messages
 certstream = Thread(target=cs.listen_for_events,args=(print_callback,'wss://certstream.calidog.io/',True, ))
-analize = Thread(target=analize_message)
+#analize = Thread(target=analize_message)
 
 certstream.start()
-analize.start()
+#analize.start()
 
 #certstream.join()
 #analize.join()
